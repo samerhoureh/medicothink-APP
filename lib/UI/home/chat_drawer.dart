@@ -167,6 +167,73 @@ class _ChatDrawerState extends State<ChatDrawer> {
                   ],
                 ),
               ),
+            
+            // User Profile Section
+            Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8F9FA),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.grey.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Profile Image
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      image: const DecorationImage(
+                        image: AssetImage('assets/images/splash/medico_logo.jpg'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // User Info
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Dr. Sarah',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Cardiologist',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+                        ),
+
+                      ],
+                    ),
+                  ),
+                  // Settings Icon
+                  IconButton(
+                    icon: const Icon(
+                      Icons.settings_outlined,
+                      color: kTeal,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/profile-settings');
+                    },
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

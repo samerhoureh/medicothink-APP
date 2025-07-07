@@ -213,135 +213,138 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Colors.white,
-        drawer: ChatDrawer(
-          currentConversationId: _currentConversation?.id,
-          onConversationSelected: (conversationId) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(conversationId: conversationId),
-              ),
-            );
-          },
-        ),
-        onDrawerChanged: (isOpen) {
-          if (!isOpen) FocusScope.of(context).unfocus();
-        },
-        appBar: AppBar(
-          scrolledUnderElevation: 0,
-          surfaceTintColor: Colors.transparent,
-          leadingWidth: 90,
-          toolbarHeight: 80,
+    return SafeArea(
+      top: false,
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          key: _scaffoldKey,
           backgroundColor: Colors.white,
-          elevation: 0,
-          leading: Builder(
-            builder: (context) => Padding(
-              padding: const EdgeInsets.only(
-                left: 30,
-                top: 20,
-                bottom: 20,
-                right: 20,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
+          drawer: ChatDrawer(
+            currentConversationId: _currentConversation?.id,
+            onConversationSelected: (conversationId) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(conversationId: conversationId),
                 ),
-                child: IconButton(
-                  icon: const Icon(Icons.menu, color: kTeal),
-                  onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    Scaffold.of(context).openDrawer();
+              );
+            },
+          ),
+          onDrawerChanged: (isOpen) {
+            if (!isOpen) FocusScope.of(context).unfocus();
+          },
+          appBar: AppBar(
+            scrolledUnderElevation: 0,
+            surfaceTintColor: Colors.transparent,
+            leadingWidth: 90,
+            toolbarHeight: 80,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: Builder(
+              builder: (context) => Padding(
+                padding: const EdgeInsets.only(
+                  left: 30,
+                  top: 20,
+                  bottom: 20,
+                  right: 20,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.menu, color: kTeal),
+                    onPressed: () {
+                      FocusScope.of(context).unfocus();
+                      Scaffold.of(context).openDrawer();
+                    },
+                  ),
+                ),
+              ),
+            ),
+            title: Text(
+              _currentConversation?.title ?? 'Medical Assistant',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            actions: [
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'archive':
+                      _archiveConversation();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'archive',
+                    child: Row(
+                      children: [
+                        Icon(Icons.archive_outlined),
+                        SizedBox(width: 8),
+                        Text('Archive Conversation'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 8),
+            ],
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollCtrl,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  itemCount: (_currentConversation?.messages.length ?? 0) + 
+                      (_isTyping || _isAnalyzingImage ? 1 : 0) + 1,
+                  itemBuilder: (_, i) {
+                    if (i == 0) return const _DateLabel(label: 'Today');
+      
+                    int index = i - 1;
+                    final messages = _currentConversation?.messages ?? [];
+      
+                    if (index < messages.length) {
+                      final msg = messages[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          _ChatBubble(message: msg),
+                          if (msg.isMe) const _SeenLabel(),
+                        ],
+                      );
+                    }
+      
+                    index -= messages.length;
+      
+                    if ((_isTyping || _isAnalyzingImage) && index == 0) {
+                      return _TypingLabel(
+                        name: 'Medical Assistant',
+                        isAnalyzing: _isAnalyzingImage,
+                      );
+                    }
+      
+                    return const SizedBox.shrink();
                   },
                 ),
               ),
-            ),
-          ),
-          title: Text(
-            _currentConversation?.title ?? 'Medical Assistant',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          actions: [
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              onSelected: (value) {
-                switch (value) {
-                  case 'archive':
-                    _archiveConversation();
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'archive',
-                  child: Row(
-                    children: [
-                      Icon(Icons.archive_outlined),
-                      SizedBox(width: 8),
-                      Text('Archive Conversation'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 8),
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollCtrl,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                itemCount: (_currentConversation?.messages.length ?? 0) + 
-                    (_isTyping || _isAnalyzingImage ? 1 : 0) + 1,
-                itemBuilder: (_, i) {
-                  if (i == 0) return const _DateLabel(label: 'Today');
-
-                  int index = i - 1;
-                  final messages = _currentConversation?.messages ?? [];
-
-                  if (index < messages.length) {
-                    final msg = messages[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        _ChatBubble(message: msg),
-                        if (msg.isMe) const _SeenLabel(),
-                      ],
-                    );
-                  }
-
-                  index -= messages.length;
-
-                  if ((_isTyping || _isAnalyzingImage) && index == 0) {
-                    return _TypingLabel(
-                      name: 'Medical Assistant',
-                      isAnalyzing: _isAnalyzingImage,
-                    );
-                  }
-
-                  return const SizedBox.shrink();
-                },
+              _MessageInput(
+                controller: _textCtrl,
+                onSend: () => _sendMessage(),
+                onImagePick: _showImagePicker,
               ),
-            ),
-            _MessageInput(
-              controller: _textCtrl,
-              onSend: () => _sendMessage(),
-              onImagePick: _showImagePicker,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

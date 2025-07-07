@@ -93,13 +93,7 @@ class LoginScreen extends StatelessWidget {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          // TODO: Implement OTP login functionality
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('OTP login functionality coming soon!'),
-                              backgroundColor: kNavy,
-                            ),
-                          );
+                          Navigator.of(context).pushNamed('/otp-login');
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 const Color kTeal = Color(0xFF20A9C3);
 const Color kNavy = Color(0xFF001C46);
@@ -55,12 +56,18 @@ class LabeledField extends StatelessWidget {
   final String hint;
   final IconData icon;
   final bool obscure;
+  final TextEditingController? controller;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   const LabeledField({
     super.key,
     required this.label,
     required this.hint,
     required this.icon,
     this.obscure = false,
+    this.controller,
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   @override
@@ -71,7 +78,10 @@ class LabeledField extends StatelessWidget {
         Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
         const SizedBox(height: 4),
         TextField(
+          controller: controller,
           obscureText: obscure,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
           decoration: InputDecoration(
             hintText: hint,
             filled: true,

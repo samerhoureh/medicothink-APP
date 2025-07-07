@@ -85,7 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       children: [
                         Image.asset(
                           slide.botImage,
-                          height: size.height * 0.30,
+                          height: 230,
                         ),
 
                         // title

@@ -3,7 +3,9 @@ import 'package:medicothink/UI/splash/splash_screen.dart';
 
 import 'UI/auth/login_screen.dart';
 import 'UI/auth/register_screen.dart';
+import 'UI/auth/otp_login_screen.dart';
 import 'UI/home/chat_screen.dart';
+import 'UI/home/profile_settings_screen.dart';
 import 'UI/splash/onpording2.dart';
 import 'UI/home/archived_conversations_screen.dart';
 class AppRouter {
@@ -13,6 +15,10 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SplashScreen());
         case '/login':
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+      case '/otp-login':
+        return MaterialPageRoute(builder: (_) => const OtpLoginScreen());
+      case '/profile-settings':
+        return MaterialPageRoute(builder: (_) => const ProfileSettingsScreen());
       case '/register':
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case '/onboarding2':
