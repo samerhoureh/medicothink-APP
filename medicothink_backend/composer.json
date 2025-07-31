@@ -1,0 +1,11 @@
+@@ .. @@
+     "require": {
+         "php": "^8.2",
+         "laravel/framework": "^11.0",
+         "laravel/tinker": "^2.9"
++        "tymon/jwt-auth": "^2.0",
++        "openai-php/laravel": "^0.8.1",
++        "twilio/sdk": "^7.0",
++        "stripe/stripe-php": "^10.0",
++        "intervention/image": "^3.0"
+     },
