@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../utils/constants.dart';
 
-const Color kTeal = Color(0xFF20A9C3);
-const Color kNavy = Color(0xFF001C46);
+const Color kTeal = AppColors.kTeal;
+const Color kNavy = AppColors.kNavy;
 
 class AuthCard extends StatelessWidget {
   final String title;
@@ -59,6 +60,7 @@ class LabeledField extends StatelessWidget {
   final TextEditingController? controller;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
+  final String? Function(String?)? validator;
   const LabeledField({
     super.key,
     required this.label,
@@ -68,6 +70,7 @@ class LabeledField extends StatelessWidget {
     this.controller,
     this.keyboardType,
     this.inputFormatters,
+    this.validator,
   });
 
   @override
@@ -77,11 +80,12 @@ class LabeledField extends StatelessWidget {
       children: [
         Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
         const SizedBox(height: 4),
-        TextField(
+        TextFormField(
           controller: controller,
           obscureText: obscure,
           keyboardType: keyboardType,
           inputFormatters: inputFormatters,
+          validator: validator,
           decoration: InputDecoration(
             hintText: hint,
             filled: true,
@@ -91,6 +95,14 @@ class LabeledField extends StatelessWidget {
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.red, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
           ),
         ),

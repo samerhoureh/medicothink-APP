@@ -30,4 +30,8 @@ class ApiConfig {
   // Request timeout
   static const Duration requestTimeout = Duration(seconds: 30);
   static const Duration connectionTimeout = Duration(seconds: 15);
+  
+  // API Keys (يجب تعيينها من متغيرات البيئة)
+  static const String apiKey = String.fromEnvironment('API_KEY', defaultValue: '');
+  static const String encryptionKey = String.fromEnvironment('ENCRYPTION_KEY', defaultValue: '');
 }

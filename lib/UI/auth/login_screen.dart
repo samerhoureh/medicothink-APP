@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
-import '../../models/api_response.dart';
+import '../../utils/constants.dart';
+import '../../utils/helpers.dart';
+import '../../utils/validators.dart';
 import 'auth_card.dart' hide kTeal;
 import 'register_screen.dart';
 
@@ -15,9 +17,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final AuthService _authService = AuthService();
   bool _isLoading = false;
-  String _errorMessage = '';
 
   @override
   void dispose() {
@@ -27,16 +29,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      setState(() {
-        _errorMessage = 'Please fill in all fields';
-      });
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
+    AppHelpers.hideKeyboard(context);
+
     setState(() {
       _isLoading = true;
-      _errorMessage = '';
     });
 
     try {
@@ -46,18 +46,27 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.isSuccess) {
+        AppHelpers.showSnackBar(
+          context,
+          AppStrings.loginSuccess,
+          type: SnackBarType.success,
+        );
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/chat');
+          Navigator.pushReplacementNamed(context, AppRoutes.chat);
         }
       } else {
-        setState(() {
-          _errorMessage = response.message;
-        });
+        AppHelpers.showSnackBar(
+          context,
+          response.message,
+          type: SnackBarType.error,
+        );
       }
     } catch (e) {
-      setState(() {
-        _errorMessage = 'An error occurred. Please try again.';
-      });
+      AppHelpers.showSnackBar(
+        context,
+        AppStrings.unknownError,
+        type: SnackBarType.error,
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -80,10 +89,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
             const Spacer(),
 
-            Container(
+            Form(
+              key: _formKey,
+              child: Container(
               width: double.infinity,
               decoration: const BoxDecoration(
-                color: kTeal,
+                color: AppColors.kTeal,
               
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(50),
@@ -126,6 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       icon: Icons.email_outlined,
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
+                      validator: Validators.validateEmail,
                     ),
                     const SizedBox(height: 16),
                     LabeledField(
@@ -134,32 +146,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       icon: Icons.lock_outline,
                       obscure: true,
                       controller: _passwordController,
+                      validator: Validators.validatePassword,
                     ),
-
-                    if (_errorMessage.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.red.withOpacity(0.3)),
-                        ),
-                        child: Text(
-                          _errorMessage,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
 
                     const SizedBox(height: 32),
                     PrimaryButton(
-                      text: _isLoading ? 'LOGGING IN...' : 'LOGIN',
+                      text: _isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول',
                       onTap: _isLoading ? () {} : _login,
                     ),
                     const SizedBox(height: 24),
@@ -179,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Center(
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushNamed('/otp-login');
+                          Navigator.of(context).pushNamed(AppRoutes.otpLogin);
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -191,12 +183,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Icon(Icons.phone_android, color: kNavy, size: 20),
+                              Icon(Icons.phone_android, color: AppColors.kNavy, size: 20),
                               SizedBox(width: 8),
                               Text(
-                                'Login with OTP',
+                                'تسجيل الدخول بـ OTP',
                                 style: TextStyle(
-                                  color: kNavy,
+                                  color: AppColors.kNavy,
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
                                 ),
@@ -210,19 +202,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Don't have account? ", style: TextStyle(color: Colors.white70)),
+                        const Text("ليس لديك حساب؟ ", style: TextStyle(color: Colors.white70)),
                         GestureDetector(
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(builder: (_) => const RegisterScreen()),
                           ),
-                          child: const Text('Register',
+                          child: const Text('إنشاء حساب',
                               style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
+              )),
             ),
           ],
         ),

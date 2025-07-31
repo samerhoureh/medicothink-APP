@@ -12,6 +12,8 @@ class User {
   final DateTime createdAt;
   final DateTime updatedAt;
   final SubscriptionStatus? subscription;
+  final bool isActive;
+  final bool isVerified;
 
   User({
     required this.id,
@@ -27,6 +29,8 @@ class User {
     required this.createdAt,
     required this.updatedAt,
     this.subscription,
+    this.isActive = true,
+    this.isVerified = false,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -35,7 +39,7 @@ class User {
       username: json['username'] ?? '',
       email: json['email'] ?? '',
       phoneNumber: json['phone_number'],
-      age: json['age'],
+      age: json['age'] != null ? int.tryParse(json['age'].toString()) : null,
       city: json['city'],
       nationality: json['nationality'],
       specialization: json['specialization'],
@@ -46,6 +50,8 @@ class User {
       subscription: json['subscription'] != null 
           ? SubscriptionStatus.fromJson(json['subscription'])
           : null,
+      isActive: json['is_active'] ?? true,
+      isVerified: json['is_verified'] ?? false,
     );
   }
 
@@ -64,6 +70,8 @@ class User {
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'subscription': subscription?.toJson(),
+      'is_active': isActive,
+      'is_verified': isVerified,
     };
   }
 
@@ -81,6 +89,8 @@ class User {
     DateTime? createdAt,
     DateTime? updatedAt,
     SubscriptionStatus? subscription,
+    bool? isActive,
+    bool? isVerified,
   }) {
     return User(
       id: id ?? this.id,
@@ -96,23 +106,43 @@ class User {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       subscription: subscription ?? this.subscription,
+      isActive: isActive ?? this.isActive,
+      isVerified: isVerified ?? this.isVerified,
     );
   }
+
+  // Helper methods
+  bool get hasActiveSubscription => subscription?.isActive == true && subscription?.isExpired == false;
+  bool get isSubscriptionExpiringSoon => subscription?.isExpiringSoon == true;
+  String get displayName => username.isNotEmpty ? username : email.split('@').first;
+  String get initials => username.isNotEmpty 
+      ? username.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
+      : email.isNotEmpty ? email[0].toUpperCase() : '?';
 }
 
 class SubscriptionStatus {
   final String id;
   final String planName;
+  final String planType;
   final DateTime expiresAt;
+  final DateTime? startedAt;
   final bool isActive;
   final int daysRemaining;
+  final double? price;
+  final String? currency;
+  final bool autoRenew;
 
   SubscriptionStatus({
     required this.id,
     required this.planName,
+    required this.planType,
     required this.expiresAt,
+    this.startedAt,
     required this.isActive,
     required this.daysRemaining,
+    this.price,
+    this.currency,
+    this.autoRenew = false,
   });
 
   factory SubscriptionStatus.fromJson(Map<String, dynamic> json) {
@@ -123,9 +153,14 @@ class SubscriptionStatus {
     return SubscriptionStatus(
       id: json['id'].toString(),
       planName: json['plan_name'] ?? '',
+      planType: json['plan_type'] ?? 'basic',
       expiresAt: expiresAt,
+      startedAt: json['started_at'] != null ? DateTime.parse(json['started_at']) : null,
       isActive: json['is_active'] ?? false,
       daysRemaining: daysRemaining > 0 ? daysRemaining : 0,
+      price: json['price'] != null ? double.tryParse(json['price'].toString()) : null,
+      currency: json['currency'] ?? 'USD',
+      autoRenew: json['auto_renew'] ?? false,
     );
   }
 
@@ -133,12 +168,25 @@ class SubscriptionStatus {
     return {
       'id': id,
       'plan_name': planName,
+      'plan_type': planType,
       'expires_at': expiresAt.toIso8601String(),
+      'started_at': startedAt?.toIso8601String(),
       'is_active': isActive,
       'days_remaining': daysRemaining,
+      'price': price,
+      'currency': currency,
+      'auto_renew': autoRenew,
     };
   }
 
   bool get isExpired => DateTime.now().isAfter(expiresAt);
   bool get isExpiringSoon => daysRemaining <= 7 && daysRemaining > 0;
+  bool get isPremium => planType.toLowerCase() != 'basic' && planType.toLowerCase() != 'free';
+  
+  String get statusText {
+    if (isExpired) return 'Expired';
+    if (isExpiringSoon) return 'Expiring Soon';
+    if (isActive) return 'Active';
+    return 'Inactive';
+  }
 }
