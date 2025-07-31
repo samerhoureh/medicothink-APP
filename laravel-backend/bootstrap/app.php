@@ -12,28 +12,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Remove Sanctum middleware since we're using JWT
-        // $middleware->api(prepend: [
-        //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        // ]);
-
         $middleware->alias([
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             'subscription.active' => \App\Http\Middleware\CheckActiveSubscription::class,
         ]);
 
-        $middleware->validateCsrfTokens(except: [
-            'api/*',
+        $middleware->web(remove: [
+            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (Throwable $e) {
-            if (request()->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'An error occurred',
-                    'error' => app()->environment('local') ? $e->getMessage() : 'Server error'
-                ], 500);
-            }
-        });
+        //
     })->create();
