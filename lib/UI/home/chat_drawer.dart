@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/conversation.dart';
-import '../../services/conversation_service.dart';
+import '../../services/enhanced_conversation_service.dart';
 import 'archived_conversations_screen.dart';
 
 const Color kTeal = Color(0xFF20A9C3);
@@ -31,7 +31,7 @@ class _ChatDrawerState extends State<ChatDrawer> {
   }
 
   Future<void> _loadConversations() async {
-    final conversations = await ConversationService.getActiveConversations();
+    final conversations = await EnhancedConversationService.getActiveConversations();
     setState(() {
       _conversations = conversations;
       _isLoading = false;
@@ -39,12 +39,12 @@ class _ChatDrawerState extends State<ChatDrawer> {
   }
 
   Future<void> _deleteConversation(String conversationId) async {
-    await ConversationService.deleteConversation(conversationId);
+    await EnhancedConversationService.deleteConversation(conversationId);
     await _loadConversations();
   }
 
   Future<void> _archiveConversation(String conversationId) async {
-    await ConversationService.archiveConversation(conversationId);
+    await EnhancedConversationService.archiveConversation(conversationId);
     await _loadConversations();
     
     if (mounted) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../services/auth_service.dart';
 import 'auth_card.dart';
 
 class OtpLoginScreen extends StatefulWidget {
@@ -11,6 +12,7 @@ class OtpLoginScreen extends StatefulWidget {
 
 class _OtpLoginScreenState extends State<OtpLoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  final AuthService _authService = AuthService();
   final List<TextEditingController> _otpControllers = List.generate(
     4,
     (index) => TextEditingController(),
@@ -56,20 +58,35 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
       _errorMessage = '';
     });
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final response = await _authService.sendOtp(_phoneController.text.trim());
+      
+      if (response.isSuccess) {
+        setState(() {
+          _isOtpSent = true;
+          _isLoading = false;
+        });
 
-    setState(() {
-      _isOtpSent = true;
-      _isLoading = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('OTP sent successfully!'),
-        backgroundColor: kNavy,
-      ),
-    );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('OTP sent successfully!'),
+              backgroundColor: kNavy,
+            ),
+          );
+        }
+      } else {
+        setState(() {
+          _errorMessage = response.message;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to send OTP. Please try again.';
+        _isLoading = false;
+      });
+    }
   }
 
   void _verifyOtp() async {
@@ -87,19 +104,26 @@ class _OtpLoginScreenState extends State<OtpLoginScreen> {
       _errorMessage = '';
     });
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final response = await _authService.verifyOtp(
+        _phoneController.text.trim(),
+        otp,
+      );
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    // For demo purposes, accept any 4-digit OTP
-    if (otp.length == 4) {
-      Navigator.pushReplacementNamed(context, '/chat');
-    } else {
+      if (response.isSuccess) {
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/chat');
+        }
+      } else {
+        setState(() {
+          _errorMessage = response.message;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
       setState(() {
-        _errorMessage = 'Invalid OTP. Please try again.';
+        _errorMessage = 'OTP verification failed. Please try again.';
+        _isLoading = false;
       });
     }
   }

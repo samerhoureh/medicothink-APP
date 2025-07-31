@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/conversation.dart';
-import '../../services/conversation_service.dart';
+import '../../services/enhanced_conversation_service.dart';
 import 'chat_screen.dart';
 
 const Color kTeal = Color(0xFF20A9C3);
@@ -23,7 +23,7 @@ class _ArchivedConversationsScreenState extends State<ArchivedConversationsScree
   }
 
   Future<void> _loadArchivedConversations() async {
-    final conversations = await ConversationService.getArchivedConversations();
+    final conversations = await EnhancedConversationService.getArchivedConversations();
     setState(() {
       _archivedConversations = conversations;
       _isLoading = false;
@@ -31,7 +31,7 @@ class _ArchivedConversationsScreenState extends State<ArchivedConversationsScree
   }
 
   Future<void> _unarchiveConversation(String conversationId) async {
-    await ConversationService.unarchiveConversation(conversationId);
+    await EnhancedConversationService.unarchiveConversation(conversationId);
     await _loadArchivedConversations();
     
     if (mounted) {
@@ -45,7 +45,7 @@ class _ArchivedConversationsScreenState extends State<ArchivedConversationsScree
   }
 
   Future<void> _deleteConversation(String conversationId) async {
-    await ConversationService.deleteConversation(conversationId);
+    await EnhancedConversationService.deleteConversation(conversationId);
     await _loadArchivedConversations();
     
     if (mounted) {

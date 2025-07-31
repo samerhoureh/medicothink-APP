@@ -2,10 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../models/conversation.dart';
-import '../../services/conversation_service.dart';
+import '../../services/enhanced_conversation_service.dart';
+import '../../services/ai_chat_service.dart';
+import '../../services/subscription_service.dart';
+import '../../services/auth_service.dart';
 import '../../services/image_service.dart';
+import '../widgets/subscription_alert_widget.dart';
 import 'chat_drawer.dart';
 import 'image_picker_bottom_sheet.dart';
+import 'conversation_summary_screen.dart';
 
 const Color kTeal = Color(0xFF20A9C3);
 
@@ -23,19 +28,49 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _textCtrl = TextEditingController();
   final ScrollController _scrollCtrl = ScrollController();
 
+  final AiChatService _aiChatService = AiChatService();
+  final SubscriptionService _subscriptionService = SubscriptionService();
+  final AuthService _authService = AuthService();
+
   Conversation? _currentConversation;
   bool _isTyping = false;
   bool _isAnalyzingImage = false;
+  SubscriptionAlert? _subscriptionAlert;
 
   @override
   void initState() {
     super.initState();
     _loadConversation();
+    _checkSubscriptionStatus();
+  }
+
+  Future<void> _checkSubscriptionStatus() async {
+    try {
+      final response = await _subscriptionService.getSubscriptionStatus();
+      if (response.isSuccess && response.data != null) {
+        final alert = _subscriptionService.getSubscriptionAlert(response.data!);
+        if (alert != null) {
+          setState(() {
+            _subscriptionAlert = alert;
+          });
+          
+          // If subscription is expired, handle it
+          if (alert.type == SubscriptionAlertType.expired) {
+            await _subscriptionService.handleSubscriptionExpiry();
+            if (mounted) {
+              Navigator.pushReplacementNamed(context, '/login');
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print('Error checking subscription: $e');
+    }
   }
 
   Future<void> _loadConversation() async {
     if (widget.conversationId != null) {
-      final conversations = await ConversationService.getConversations();
+      final conversations = await EnhancedConversationService.getConversations();
       final conversation = conversations.firstWhere(
         (c) => c.id == widget.conversationId,
         orElse: () => _createNewConversation(),
@@ -43,11 +78,11 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         _currentConversation = conversation;
       });
-      await ConversationService.setCurrentConversationId(conversation.id);
+      await EnhancedConversationService.setCurrentConversationId(conversation.id);
     } else {
-      final currentId = await ConversationService.getCurrentConversationId();
+      final currentId = await EnhancedConversationService.getCurrentConversationId();
       if (currentId != null) {
-        final conversations = await ConversationService.getConversations();
+        final conversations = await EnhancedConversationService.getConversations();
         final conversation = conversations.firstWhere(
           (c) => c.id == currentId,
           orElse: () => _createNewConversation(),
@@ -95,6 +130,18 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _sendMessage({String? text, String? imagePath}) async {
     if (_currentConversation == null) return;
     
+    // Check subscription before sending message
+    final canAccess = await _subscriptionService.canAccessPremiumFeatures();
+    if (!canAccess) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please renew your subscription to continue chatting'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    
     final messageText = text ?? _textCtrl.text.trim();
     if (messageText.isEmpty && imagePath == null) return;
 
@@ -112,8 +159,8 @@ class _ChatScreenState extends State<ChatScreen> {
       _currentConversation = _currentConversation!.copyWith(
         messages: [..._currentConversation!.messages, userMessage],
         lastMessageAt: now,
-        title: _currentConversation!.title == 'New Conversation' 
-            ? ConversationService.generateConversationTitle(messageText)
+        title: _currentConversation!.title == 'New Conversation'
+            ? EnhancedConversationService.generateConversationTitle(messageText)
             : _currentConversation!.title,
       );
       if (imagePath != null) {
@@ -127,16 +174,17 @@ class _ChatScreenState extends State<ChatScreen> {
     _scrollToBottom();
 
     // Save conversation
-    await ConversationService.saveConversation(_currentConversation!);
-    await ConversationService.setCurrentConversationId(_currentConversation!.id);
+    await EnhancedConversationService.saveConversation(_currentConversation!);
+    await EnhancedConversationService.setCurrentConversationId(_currentConversation!.id);
 
     // Generate response
     String responseText;
     if (imagePath != null) {
-      responseText = await ImageService.analyzeImage(imagePath);
+      final response = await _aiChatService.analyzeImage(_currentConversation!.id, File(imagePath));
+      responseText = response.isSuccess ? response.data! : 'Failed to analyze image';
     } else {
-      await Future.delayed(const Duration(milliseconds: 1000));
-      responseText = _generateResponse(messageText);
+      final response = await _aiChatService.sendMessage(_currentConversation!.id, messageText);
+      responseText = response.isSuccess ? response.data! : 'Failed to get response';
     }
 
     final responseMessage = Message(
@@ -156,17 +204,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     _scrollToBottom();
-    await ConversationService.saveConversation(_currentConversation!);
-  }
-
-  String _generateResponse(String message) {
-    final responses = [
-      'Thank you for sharing that information. Based on what you\'ve described, I recommend consulting with a healthcare professional for proper evaluation.',
-      'I understand your concern. It\'s important to monitor your symptoms and seek medical attention if they persist or worsen.',
-      'That\'s a good question. While I can provide general information, it\'s always best to discuss specific symptoms with your doctor.',
-      'I appreciate you reaching out. For personalized medical advice, please consult with a qualified healthcare provider.',
-    ];
-    return responses[DateTime.now().millisecond % responses.length];
+    await EnhancedConversationService.saveConversation(_currentConversation!);
   }
 
   Future<void> _showImagePicker() async {
@@ -192,7 +230,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> _archiveConversation() async {
     if (_currentConversation == null) return;
     
-    await ConversationService.archiveConversation(_currentConversation!.id);
+    await EnhancedConversationService.archiveConversation(_currentConversation!.id);
     
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -206,9 +244,23 @@ class _ChatScreenState extends State<ChatScreen> {
       setState(() {
         _currentConversation = _createNewConversation();
       });
-      await ConversationService.saveConversation(_currentConversation!);
-      await ConversationService.setCurrentConversationId(_currentConversation!.id);
+      await EnhancedConversationService.saveConversation(_currentConversation!);
+      await EnhancedConversationService.setCurrentConversationId(_currentConversation!.id);
     }
+  }
+
+  void _showConversationSummary() {
+    if (_currentConversation == null) return;
+    
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ConversationSummaryScreen(
+          conversationId: _currentConversation!.id,
+          conversationTitle: _currentConversation!.title,
+        ),
+      ),
+    );
   }
 
   @override
@@ -279,9 +331,22 @@ class _ChatScreenState extends State<ChatScreen> {
                     case 'archive':
                       _archiveConversation();
                       break;
+                    case 'summary':
+                      _showConversationSummary();
+                      break;
                   }
                 },
                 itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'summary',
+                    child: Row(
+                      children: [
+                        Icon(Icons.summarize_outlined),
+                        SizedBox(width: 8),
+                        Text('View Summary'),
+                      ],
+                    ),
+                  ),
                   const PopupMenuItem(
                     value: 'archive',
                     child: Row(
@@ -299,6 +364,26 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           body: Column(
             children: [
+              // Subscription Alert
+              if (_subscriptionAlert != null)
+                SubscriptionAlertWidget(
+                  alert: _subscriptionAlert!,
+                  onRenewPressed: () {
+                    // TODO: Navigate to subscription screen
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Subscription renewal coming soon!'),
+                        backgroundColor: kTeal,
+                      ),
+                    );
+                  },
+                  onDismissPressed: () {
+                    setState(() {
+                      _subscriptionAlert = null;
+                    });
+                  },
+                ),
+
               Expanded(
                 child: ListView.builder(
                   controller: _scrollCtrl,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../home/chat_drawer.dart';
+import '../../services/auth_service.dart';
 import 'auth_card.dart' hide kTeal;
 
 class RegisterScreen extends StatefulWidget {
@@ -11,9 +11,86 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _nationalityController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  
+  final AuthService _authService = AuthService();
   String? selectedSpecialization;
   String? selectedEducationLevel;
   bool isDragging = false;
+  bool _isLoading = false;
+  String _errorMessage = '';
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _ageController.dispose();
+    _cityController.dispose();
+    _nationalityController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _register() async {
+    // Validate required fields
+    if (_usernameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _phoneController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please fill in all required fields';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final userData = {
+        'username': _usernameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'phone_number': _phoneController.text.trim(),
+        'age': _ageController.text.isNotEmpty ? int.tryParse(_ageController.text) : null,
+        'city': _cityController.text.trim(),
+        'nationality': _nationalityController.text.trim(),
+        'specialization': selectedSpecialization,
+        'education_level': selectedEducationLevel,
+        'password': _passwordController.text,
+      };
+
+      final response = await _authService.register(userData);
+
+      if (response.isSuccess) {
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/chat');
+        }
+      } else {
+        setState(() {
+          _errorMessage = response.message;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Registration failed. Please try again.';
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   Widget _buildDropdownField({
     required String label,
@@ -169,36 +246,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         label: 'Username',
                                         hint: 'your username...',
                                         icon: Icons.person_outlined,
+                                        controller: _usernameController,
                                       ),
                                       const SizedBox(height: 16),
                                       LabeledField(
                                         label: 'Email',
                                         hint: 'your email id...',
                                         icon: Icons.email_outlined,
+                                        controller: _emailController,
+                                        keyboardType: TextInputType.emailAddress,
                                       ),
                                       const SizedBox(height: 16),
                                       LabeledField(
                                         label: 'Phone Number',
                                         hint: 'your phone number...',
                                         icon: Icons.phone_outlined,
+                                        controller: _phoneController,
+                                        keyboardType: TextInputType.phone,
                                       ),
                                       const SizedBox(height: 16),
                                       LabeledField(
                                         label: 'Age',
                                         hint: 'your age...',
                                         icon: Icons.calendar_today_outlined,
+                                        controller: _ageController,
+                                        keyboardType: TextInputType.number,
                                       ),
                                       const SizedBox(height: 16),
                                       LabeledField(
                                         label: 'City',
                                         hint: 'your city...',
                                         icon: Icons.location_city_outlined,
+                                        controller: _cityController,
                                       ),
                                       const SizedBox(height: 16),
                                       LabeledField(
                                         label: 'Nationality',
                                         hint: 'your nationality...',
                                         icon: Icons.flag_outlined,
+                                        controller: _nationalityController,
                                       ),
                                       const SizedBox(height: 16),
                                       _buildDropdownField(
@@ -231,16 +317,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         hint: 'password',
                                         icon: Icons.lock_outline,
                                         obscure: true,
+                                        controller: _passwordController,
                                       ),
+
+                                      if (_errorMessage.isNotEmpty) ...[
+                                        const SizedBox(height: 16),
+                                        Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                            border: Border.all(color: Colors.red.withOpacity(0.3)),
+                                          ),
+                                          child: Text(
+                                            _errorMessage,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 14,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+
                                       const SizedBox(height: 32),
                                       PrimaryButton(
-                                        text: 'REGISTER',
-                                        onTap: () {
-                                          Navigator.pushReplacementNamed(
-                                            context,
-                                            '/chat',
-                                          );
-                                        },
+                                        text: _isLoading ? 'REGISTERING...' : 'REGISTER',
+                                        onTap: _isLoading ? () {} : _register,
                                       ),
                                       const SizedBox(height: 24),
                                       Row(

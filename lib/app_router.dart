@@ -8,6 +8,7 @@ import 'UI/home/chat_screen.dart';
 import 'UI/home/profile_settings_screen.dart';
 import 'UI/splash/onpording2.dart';
 import 'UI/home/archived_conversations_screen.dart';
+import 'UI/home/conversation_summary_screen.dart';
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -27,6 +28,24 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ChatScreen());
       case '/archived':
         return MaterialPageRoute(builder: (_) => const ArchivedConversationsScreen());
+
+      case '/conversation-summary':
+        final args = settings.arguments as Map<String, String>?;
+        if (args != null) {
+          return MaterialPageRoute(
+            builder: (_) => ConversationSummaryScreen(
+              conversationId: args['conversationId']!,
+              conversationTitle: args['conversationTitle']!,
+            ),
+          );
+        }
+        return MaterialPageRoute(
+          builder: (_) => Scaffold(
+            body: Center(
+              child: Text('Invalid conversation summary arguments'),
+            ),
+          ),
+        );
 
       default:
         return MaterialPageRoute(

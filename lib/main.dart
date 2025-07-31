@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'services/api_service.dart';
+import 'services/auth_service.dart';
 import 'app_router.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize services
+  await ApiService().initialize();
+  await AuthService().initialize();
+  
   runApp(const MyApp());
 }
 
