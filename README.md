@@ -1,218 +1,227 @@
-# MedicoThink - Medical AI Assistant
+# MedicoThink - Medical AI Assistant Mobile App
 
-تطبيق مساعد طبي ذكي يستخدم الذكاء الاصطناعي لتقديم المشورة الطبية والتحليل الطبي للصور.
+A Flutter mobile application that provides AI-powered medical assistance and consultation.
 
-## المميزات الرئيسية
+## 📱 Mobile Application Features
 
-### 🔐 نظام المصادقة
-- تسجيل الدخول بالبريد الإلكتروني وكلمة المرور
-- تسجيل الدخول باستخدام OTP عبر رقم الهاتف
-- إنشاء حساب جديد مع معلومات طبية مفصلة
-- إدارة الملف الشخصي
+### 🔐 Authentication System
+- Email/password login
+- OTP login via phone number
+- User registration with medical profile
+- Secure token-based authentication
 
-### 🤖 الذكاء الاصطناعي
-- محادثة ذكية مع مساعد طبي AI
-- تحليل الصور الطبية باستخدام AI
-- إنشاء ملخصات للمحادثات في شكل بطاقات تعليمية
-- تصنيف المعلومات الطبية (أعراض، تشخيص، علاج، إلخ)
+### 🤖 AI Medical Assistant
+- Real-time chat with medical AI
+- Medical image analysis
+- Conversation summaries with flash cards
+- Context-aware medical advice
 
-### 💬 إدارة المحادثات
-- حفظ المحادثات تلقائياً
-- أرشفة المحادثات القديمة
-- البحث في المحادثات السابقة
-- مزامنة المحادثات مع الخادم
+### 💬 Conversation Management
+- Save conversations automatically
+- Archive old conversations
+- Search through conversation history
+- Sync with backend server
 
-### 📱 واجهة المستخدم
-- تصميم عصري ومتجاوب
-- دعم اللغة العربية
-- رسوم متحركة سلسة
-- تجربة مستخدم محسنة
+### 📱 Mobile-Optimized UI
+- Modern, responsive design
+- Arabic language support
+- Smooth animations
+- Optimized user experience
 
-### 💳 إدارة الاشتراكات
-- مراقبة حالة الاشتراك
-- تنبيهات انتهاء الاشتراك
-- إغلاق الحساب عند انتهاء الاشتراك
-- خطط اشتراك متعددة
+### 💳 Subscription Management
+- Monitor subscription status
+- Subscription expiry alerts
+- Account lockout on expiry
+- Multiple subscription plans
 
-## التقنيات المستخدمة
+## 🛠 Technology Stack
 
-### Frontend (Flutter)
-- **Flutter**: إطار عمل تطوير التطبيقات
-- **Dart**: لغة البرمجة
-- **HTTP**: للتواصل مع API
-- **SharedPreferences**: لحفظ البيانات محلياً
-- **ImagePicker**: لاختيار الصور
-- **PermissionHandler**: لإدارة الأذونات
+### Mobile App (Flutter)
+- **Flutter**: Cross-platform mobile framework
+- **Dart**: Programming language
+- **HTTP**: API communication
+- **SharedPreferences**: Local data storage
+- **ImagePicker**: Camera and gallery access
+- **PermissionHandler**: Device permissions
 
 ### Backend Integration
-- **Laravel API**: نظام إدارة الخلفية
-- **JWT Authentication**: نظام المصادقة
-- **RESTful APIs**: واجهات برمجة التطبيقات
-- **File Upload**: رفع الصور للتحليل
+- **RESTful APIs**: Communication with Laravel backend
+- **JWT Authentication**: Secure token-based auth
+- **File Upload**: Image analysis capabilities
+- **Real-time Sync**: Conversation synchronization
 
-### خدمات إضافية
-- **AI Integration**: تكامل مع خدمات الذكاء الاصطناعي
-- **Push Notifications**: الإشعارات الفورية
-- **Crash Reporting**: تتبع الأخطاء
-- **Analytics**: تحليل استخدام التطبيق
-
-## هيكل المشروع
+## 📁 Project Structure
 
 ```
 lib/
-├── config/           # إعدادات التطبيق
-├── models/           # نماذج البيانات
-├── services/         # خدمات التطبيق
-├── UI/              # واجهات المستخدم
-│   ├── auth/        # شاشات المصادقة
-│   ├── home/        # الشاشة الرئيسية والمحادثة
-│   ├── splash/      # شاشات البداية
-│   └── widgets/     # المكونات المشتركة
-├── utils/           # أدوات مساعدة
-└── main.dart        # نقطة البداية
+├── config/           # App configuration
+├── models/           # Data models
+├── services/         # Business logic services
+├── UI/              # User interface screens
+│   ├── auth/        # Authentication screens
+│   ├── home/        # Main app screens
+│   ├── splash/      # Onboarding screens
+│   └── widgets/     # Reusable UI components
+├── utils/           # Helper utilities
+└── main.dart        # App entry point
 ```
 
-## التثبيت والتشغيل
+## 🚀 Getting Started
 
-### المتطلبات
+### Prerequisites
 - Flutter SDK (3.0+)
 - Dart SDK (3.0+)
 - Android Studio / VS Code
-- جهاز Android أو iOS للاختبار
+- Android/iOS device or emulator
 
-### خطوات التثبيت
+### Installation
 
-1. **استنساخ المشروع**
+1. **Clone the repository**
 ```bash
-git clone https://github.com/your-repo/medicothink.git
-cd medicothink
+git clone https://github.com/your-repo/medicothink-mobile.git
+cd medicothink-mobile
 ```
 
-2. **تثبيت التبعيات**
+2. **Install dependencies**
 ```bash
 flutter pub get
 ```
 
-3. **إعداد API**
-- قم بتحديث `lib/config/api_config.dart` برابط API الخاص بك
-- تأكد من تشغيل خادم Laravel
+3. **Configure API endpoint**
+Update `lib/config/api_config.dart` with your backend URL:
+```dart
+static const String baseUrl = 'https://your-api-domain.com/api';
+```
 
-4. **تشغيل التطبيق**
+4. **Run the app**
 ```bash
 flutter run
 ```
 
-## إعداد Laravel Backend
+## 🔧 Configuration
 
-### متطلبات الخادم
-- PHP 8.1+
-- Laravel 10+
-- MySQL/PostgreSQL
-- Redis (اختياري)
+### API Configuration
+Update the API base URL in `lib/config/api_config.dart`:
+```dart
+class ApiConfig {
+  static const String baseUrl = 'https://your-backend-domain.com/api';
+  // ... other configurations
+}
+```
 
-### نقاط النهاية المطلوبة
+### Permissions
+The app requires the following permissions:
+- **Camera**: For taking medical photos
+- **Photo Library**: For selecting images
+- **Internet**: For API communication
+- **Storage**: For temporary file storage
 
-#### المصادقة
-- `POST /api/auth/login` - تسجيل الدخول
-- `POST /api/auth/register` - إنشاء حساب
-- `POST /api/auth/otp-login` - إرسال OTP
-- `POST /api/auth/verify-otp` - التحقق من OTP
-- `POST /api/auth/logout` - تسجيل الخروج
+## 📱 Mobile App Features
 
-#### المحادثات
-- `GET /api/conversations` - جلب المحادثات
-- `POST /api/ai/chat` - إرسال رسالة للـ AI
-- `POST /api/ai/analyze-image` - تحليل صورة
-- `GET /api/conversations/summary/{id}` - ملخص المحادثة
+### Authentication Flow
+1. Splash screen with app branding
+2. Onboarding screens explaining features
+3. Login/Register options
+4. OTP verification for phone login
+5. Profile setup and management
 
-#### الاشتراكات
-- `GET /api/subscription/status` - حالة الاشتراك
-- `POST /api/subscription/subscribe` - اشتراك جديد
+### Main Chat Interface
+1. AI-powered medical conversations
+2. Image upload and analysis
+3. Conversation history sidebar
+4. Real-time message sync
+5. Offline message queuing
 
-## الأمان
+### Conversation Management
+1. Automatic conversation saving
+2. Archive/unarchive functionality
+3. Conversation search and filtering
+4. Summary generation with flash cards
+5. Export conversation data
 
-### حماية البيانات
-- تشفير كلمات المرور
-- JWT tokens آمنة
-- HTTPS إجباري
-- تشفير البيانات الحساسة
+## 🔒 Security Features
 
-### الخصوصية
-- عدم حفظ الصور الطبية
-- حذف المحادثات القديمة
-- إخفاء الهوية في التحليلات
-- موافقة المستخدم على جمع البيانات
+### Data Protection
+- Secure token storage
+- Encrypted API communication
+- Local data encryption
+- Automatic session management
 
-## الاختبار
+### Privacy
+- No permanent image storage
+- Conversation data encryption
+- User consent for data collection
+- GDPR compliance ready
 
-### اختبار الوحدة
+## 🧪 Testing
+
+### Run Tests
 ```bash
 flutter test
 ```
 
-### اختبار التكامل
+### Build for Release
 ```bash
-flutter test integration_test/
-```
-
-### اختبار الأداء
-```bash
-flutter test --profile
-```
-
-## النشر
-
-### Android
-```bash
+# Android
 flutter build apk --release
-```
 
-### iOS
-```bash
+# iOS
 flutter build ios --release
 ```
 
-### Web (إذا كان مدعوماً)
-```bash
-flutter build web --release
-```
+## 📦 Backend Requirements
 
-## المساهمة
+The mobile app requires a Laravel backend with the following endpoints:
 
-نرحب بالمساهمات! يرجى اتباع الخطوات التالية:
+### Authentication
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `POST /api/auth/otp-login`
+- `POST /api/auth/verify-otp`
 
-1. Fork المشروع
-2. إنشاء branch جديد (`git checkout -b feature/amazing-feature`)
-3. Commit التغييرات (`git commit -m 'Add amazing feature'`)
-4. Push إلى Branch (`git push origin feature/amazing-feature`)
-5. فتح Pull Request
+### Chat & AI
+- `POST /api/ai/chat`
+- `POST /api/ai/analyze-image`
+- `GET /api/conversations`
+- `GET /api/conversations/{id}/summary`
 
-## الترخيص
+### Subscription
+- `GET /api/subscription/status`
+- `POST /api/subscription/subscribe`
 
-هذا المشروع مرخص تحت رخصة MIT - راجع ملف [LICENSE](LICENSE) للتفاصيل.
+## 🚀 Deployment
 
-## الدعم
+### Android Play Store
+1. Build release APK
+2. Sign with release keystore
+3. Upload to Play Console
+4. Configure app listing
 
-للحصول على الدعم:
-- فتح issue في GitHub
-- التواصل عبر البريد الإلكتروني: support@medicothink.com
-- زيارة الموقع الرسمي: https://medicothink.com
+### iOS App Store
+1. Build for iOS release
+2. Archive in Xcode
+3. Upload to App Store Connect
+4. Submit for review
 
-## الإصدارات
+## 🤝 Contributing
 
-### v1.0.0 (الحالي)
-- نظام المصادقة الكامل
-- محادثة AI مع تحليل الصور
-- إدارة المحادثات والأرشفة
-- بطاقات الملخص التعليمية
-- إدارة الاشتراكات
+1. Fork the repository
+2. Create feature branch
+3. Make changes
+4. Test thoroughly
+5. Submit pull request
 
-### الإصدارات القادمة
-- دعم المزيد من اللغات
-- تحسينات الأداء
-- ميزات AI إضافية
-- تطبيق ويب
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support:
+- Email: support@medicothink.com
+- Documentation: https://docs.medicothink.com
+- Issues: GitHub Issues
 
 ---
 
-**تم تطويره بـ ❤️ لخدمة المجتمع الطبي**
+**Built for mobile-first medical assistance**

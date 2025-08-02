@@ -1,6 +1,6 @@
 class ApiConfig {
-  // Base URL for your Laravel API
-  static const String baseUrl = 'https://your-api-domain.com/api';
+  // Base URL for your Laravel web dashboard API
+  static const String baseUrl = 'https://your-dashboard-domain.com/api';
   
   // API Endpoints
   static const String loginEndpoint = '/auth/login';
@@ -31,7 +31,7 @@ class ApiConfig {
   static const Duration requestTimeout = Duration(seconds: 30);
   static const Duration connectionTimeout = Duration(seconds: 15);
   
-  // API Keys (يجب تعيينها من متغيرات البيئة)
+  // API Keys (should be set from environment variables)
   static const String apiKey = String.fromEnvironment('API_KEY', defaultValue: '');
   static const String encryptionKey = String.fromEnvironment('ENCRYPTION_KEY', defaultValue: '');
 }
