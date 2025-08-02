@@ -1,43 +1,83 @@
-@@ .. @@
-         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-     ],
- 
-+    'openai' => [
-+        'api_key' => env('OPENAI_API_KEY'),
-+        'model' => env('OPENAI_MODEL', 'gpt-4'),
-+    ],
-+
-+    'elevenlabs' => [
-+        'api_key' => env('ELEVENLABS_API_KEY'),
-+    ],
-+
-+    'stability' => [
-+        'api_key' => env('STABILITY_API_KEY'),
-+    ],
-+
-+    'stripe' => [
-+        'key' => env('STRIPE_KEY'),
-+        'secret' => env('STRIPE_SECRET'),
-+        'webhook' => [
-+            'secret' => env('STRIPE_WEBHOOK_SECRET'),
-+        ],
-+    ],
-+
-+    'paypal' => [
-+        'client_id' => env('PAYPAL_CLIENT_ID'),
-+        'secret' => env('PAYPAL_SECRET'),
-+        'settings' => [
-+            'mode' => env('PAYPAL_MODE', 'sandbox'),
-+            'http.ConnectionTimeOut' => 30,
-+            'log.LogEnabled' => true,
-+            'log.FileName' => storage_path() . '/logs/paypal.log',
-+            'log.LogLevel' => 'ERROR'
-+        ],
-+    ],
-+    'twilio' => [
-+        'sid' => env('TWILIO_SID'),
-+        'token' => env('TWILIO_TOKEN'),
-+        'from' => env('TWILIO_FROM'),
-+    ],
-+
- ];
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Third Party Services
+    |--------------------------------------------------------------------------
+    |
+    | This file is for storing the credentials for third party services such
+    | as Mailgun, Postmark, AWS and more. This file provides the de facto
+    | location for this type of information, allowing packages to have
+    | a conventional file to locate the various service credentials.
+    |
+    */
+
+    'mailgun' => [
+        'domain' => env('MAILGUN_DOMAIN'),
+        'secret' => env('MAILGUN_SECRET'),
+        'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
+        'scheme' => 'https',
+    ],
+
+    'postmark' => [
+        'token' => env('POSTMARK_TOKEN'),
+    ],
+
+    'ses' => [
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Services Configuration
+    |--------------------------------------------------------------------------
+    */
+
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-4'),
+    ],
+
+    'elevenlabs' => [
+        'key' => env('ELEVENLABS_API_KEY'),
+    ],
+
+    'stability' => [
+        'key' => env('STABILITY_API_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Gateway Configuration
+    |--------------------------------------------------------------------------
+    */
+
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+    ],
+
+    'paypal' => [
+        'client_id' => env('PAYPAL_CLIENT_ID'),
+        'secret' => env('PAYPAL_SECRET'),
+        'mode' => env('PAYPAL_MODE', 'sandbox'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | SMS Service Configuration
+    |--------------------------------------------------------------------------
+    */
+
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_TOKEN'),
+        'from' => env('TWILIO_FROM'),
+    ],
+
+];

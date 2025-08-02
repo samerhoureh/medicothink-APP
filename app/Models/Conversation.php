@@ -13,15 +13,16 @@ class Conversation extends Model
         'user_id',
         'title',
         'is_archived',
-        'last_message_at',
+        'last_message_at'
     ];
 
     protected $casts = [
         'is_archived' => 'boolean',
         'last_message_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
     ];
 
-    // Relationships
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -29,7 +30,7 @@ class Conversation extends Model
 
     public function messages()
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(Message::class)->orderBy('created_at', 'asc');
     }
 
     public function summary()
@@ -37,7 +38,6 @@ class Conversation extends Model
         return $this->hasOne(ConversationSummary::class);
     }
 
-    // Scopes
     public function scopeActive($query)
     {
         return $query->where('is_archived', false);
@@ -46,16 +46,5 @@ class Conversation extends Model
     public function scopeArchived($query)
     {
         return $query->where('is_archived', true);
-    }
-
-    // Methods
-    public function archive()
-    {
-        $this->update(['is_archived' => true]);
-    }
-
-    public function unarchive()
-    {
-        $this->update(['is_archived' => false]);
     }
 }
