@@ -1,227 +1,221 @@
-# MedicoThink - Medical AI Assistant Mobile App
+# MedicoThink - تطبيق المساعد الطبي الذكي
 
-A Flutter mobile application that provides AI-powered medical assistance and consultation.
+تطبيق موبايل أندرويد مطور بـ Flutter يوفر مساعدة طبية ذكية باستخدام الذكاء الاصطناعي.
 
-## 📱 Mobile Application Features
+## 📱 مميزات التطبيق
 
-### 🔐 Authentication System
-- Email/password login
-- OTP login via phone number
-- User registration with medical profile
-- Secure token-based authentication
+### 🔐 نظام المصادقة
+- تسجيل الدخول بالإيميل وكلمة المرور
+- تسجيل الدخول برمز OTP عبر الهاتف
+- تسجيل المستخدمين الجدد مع الملف الطبي
+- مصادقة آمنة بالرموز المميزة
 
-### 🤖 AI Medical Assistant
-- Real-time chat with medical AI
-- Medical image analysis
-- Conversation summaries with flash cards
-- Context-aware medical advice
+### 🤖 المساعد الطبي الذكي
+- محادثة فورية مع الذكاء الاصطناعي الطبي
+- تحليل الصور الطبية
+- ملخصات المحادثات مع البطاقات التعليمية
+- نصائح طبية حسب السياق
 
-### 💬 Conversation Management
-- Save conversations automatically
-- Archive old conversations
-- Search through conversation history
-- Sync with backend server
+### 💬 إدارة المحادثات
+- حفظ المحادثات تلقائياً
+- أرشفة المحادثات القديمة
+- البحث في تاريخ المحادثات
+- مزامنة مع الخادم الخلفي
 
-### 📱 Mobile-Optimized UI
-- Modern, responsive design
-- Arabic language support
-- Smooth animations
-- Optimized user experience
+### 📱 واجهة محسنة للموبايل
+- تصميم عصري ومتجاوب
+- دعم اللغة العربية
+- رسوم متحركة سلسة
+- تجربة مستخدم محسنة
 
-### 💳 Subscription Management
-- Monitor subscription status
-- Subscription expiry alerts
-- Account lockout on expiry
-- Multiple subscription plans
+### 💳 إدارة الاشتراكات
+- مراقبة حالة الاشتراك
+- تنبيهات انتهاء الاشتراك
+- قفل الحساب عند الانتهاء
+- خطط اشتراك متعددة
 
-## 🛠 Technology Stack
+## 🛠 التقنيات المستخدمة
 
-### Mobile App (Flutter)
-- **Flutter**: Cross-platform mobile framework
-- **Dart**: Programming language
-- **HTTP**: API communication
-- **SharedPreferences**: Local data storage
-- **ImagePicker**: Camera and gallery access
-- **PermissionHandler**: Device permissions
+### تطبيق الموبايل (Flutter)
+- **Flutter**: إطار عمل متعدد المنصات
+- **Dart**: لغة البرمجة
+- **HTTP**: التواصل مع API
+- **SharedPreferences**: تخزين البيانات المحلي
+- **ImagePicker**: الوصول للكاميرا والمعرض
+- **PermissionHandler**: أذونات الجهاز
 
-### Backend Integration
-- **RESTful APIs**: Communication with Laravel backend
-- **JWT Authentication**: Secure token-based auth
-- **File Upload**: Image analysis capabilities
-- **Real-time Sync**: Conversation synchronization
+### التكامل مع الخادم الخلفي
+- **RESTful APIs**: التواصل مع خادم Laravel
+- **JWT Authentication**: مصادقة آمنة بالرموز
+- **File Upload**: قدرات تحليل الصور
+- **Real-time Sync**: مزامنة المحادثات
 
-## 📁 Project Structure
+## 📁 هيكل المشروع
 
 ```
 lib/
-├── config/           # App configuration
-├── models/           # Data models
-├── services/         # Business logic services
-├── UI/              # User interface screens
-│   ├── auth/        # Authentication screens
-│   ├── home/        # Main app screens
-│   ├── splash/      # Onboarding screens
-│   └── widgets/     # Reusable UI components
-├── utils/           # Helper utilities
-└── main.dart        # App entry point
+├── config/           # إعدادات التطبيق
+├── models/           # نماذج البيانات
+├── services/         # خدمات منطق العمل
+├── UI/              # شاشات واجهة المستخدم
+│   ├── auth/        # شاشات المصادقة
+│   ├── home/        # شاشات التطبيق الرئيسية
+│   ├── splash/      # شاشات التعريف
+│   └── widgets/     # مكونات واجهة قابلة للإعادة
+├── utils/           # أدوات مساعدة
+└── main.dart        # نقطة دخول التطبيق
 ```
 
-## 🚀 Getting Started
+## 🚀 البدء
 
-### Prerequisites
+### المتطلبات المسبقة
 - Flutter SDK (3.0+)
 - Dart SDK (3.0+)
 - Android Studio / VS Code
-- Android/iOS device or emulator
+- جهاز أندرويد أو محاكي
 
-### Installation
+### التثبيت
 
-1. **Clone the repository**
+1. **استنساخ المستودع**
 ```bash
 git clone https://github.com/your-repo/medicothink-mobile.git
 cd medicothink-mobile
 ```
 
-2. **Install dependencies**
+2. **تثبيت التبعيات**
 ```bash
 flutter pub get
 ```
 
-3. **Configure API endpoint**
-Update `lib/config/api_config.dart` with your backend URL:
+3. **إعداد نقطة نهاية API**
+حدث `lib/config/api_config.dart` برابط الخادم الخلفي:
 ```dart
 static const String baseUrl = 'https://your-api-domain.com/api';
 ```
 
-4. **Run the app**
+4. **تشغيل التطبيق**
 ```bash
 flutter run
 ```
 
-## 🔧 Configuration
+## 🔧 الإعدادات
 
-### API Configuration
-Update the API base URL in `lib/config/api_config.dart`:
+### إعداد API
+حدث رابط API الأساسي في `lib/config/api_config.dart`:
 ```dart
 class ApiConfig {
   static const String baseUrl = 'https://your-backend-domain.com/api';
-  // ... other configurations
+  // ... إعدادات أخرى
 }
 ```
 
-### Permissions
-The app requires the following permissions:
-- **Camera**: For taking medical photos
-- **Photo Library**: For selecting images
-- **Internet**: For API communication
-- **Storage**: For temporary file storage
+### الأذونات
+يتطلب التطبيق الأذونات التالية:
+- **الكاميرا**: لالتقاط الصور الطبية
+- **معرض الصور**: لاختيار الصور
+- **الإنترنت**: للتواصل مع API
+- **التخزين**: لتخزين الملفات المؤقتة
 
-## 📱 Mobile App Features
+## 📱 مميزات تطبيق الموبايل
 
-### Authentication Flow
-1. Splash screen with app branding
-2. Onboarding screens explaining features
-3. Login/Register options
-4. OTP verification for phone login
-5. Profile setup and management
+### تدفق المصادقة
+1. شاشة البداية مع علامة التطبيق التجارية
+2. شاشات التعريف لشرح المميزات
+3. خيارات تسجيل الدخول/التسجيل
+4. التحقق من OTP لتسجيل الدخول بالهاتف
+5. إعداد وإدارة الملف الشخصي
 
-### Main Chat Interface
-1. AI-powered medical conversations
-2. Image upload and analysis
-3. Conversation history sidebar
-4. Real-time message sync
-5. Offline message queuing
+### واجهة المحادثة الرئيسية
+1. محادثات طبية مدعومة بالذكاء الاصطناعي
+2. رفع وتحليل الصور
+3. شريط جانبي لتاريخ المحادثات
+4. مزامنة الرسائل الفورية
+5. قائمة انتظار الرسائل غير المتصلة
 
-### Conversation Management
-1. Automatic conversation saving
-2. Archive/unarchive functionality
-3. Conversation search and filtering
-4. Summary generation with flash cards
-5. Export conversation data
+### إدارة المحادثات
+1. حفظ المحادثات تلقائياً
+2. وظائف الأرشفة/إلغاء الأرشفة
+3. البحث والتصفية في المحادثات
+4. إنشاء الملخصات مع البطاقات التعليمية
+5. تصدير بيانات المحادثة
 
-## 🔒 Security Features
+## 🔒 مميزات الأمان
 
-### Data Protection
-- Secure token storage
-- Encrypted API communication
-- Local data encryption
-- Automatic session management
+### حماية البيانات
+- تخزين آمن للرموز المميزة
+- تشفير التواصل مع API
+- تشفير البيانات المحلية
+- إدارة الجلسات التلقائية
 
-### Privacy
-- No permanent image storage
-- Conversation data encryption
-- User consent for data collection
-- GDPR compliance ready
+### الخصوصية
+- عدم تخزين الصور بشكل دائم
+- تشفير بيانات المحادثة
+- موافقة المستخدم على جمع البيانات
+- جاهز للامتثال لـ GDPR
 
-## 🧪 Testing
+## 🧪 الاختبار
 
-### Run Tests
+### تشغيل الاختبارات
 ```bash
 flutter test
 ```
 
-### Build for Release
+### البناء للإصدار
 ```bash
-# Android
+# أندرويد
 flutter build apk --release
 
 # iOS
 flutter build ios --release
 ```
 
-## 📦 Backend Requirements
+## 📦 متطلبات الخادم الخلفي
 
-The mobile app requires a Laravel backend with the following endpoints:
+يتطلب تطبيق الموبايل خادم Laravel خلفي مع النقاط التالية:
 
-### Authentication
+### المصادقة
 - `POST /api/auth/login`
 - `POST /api/auth/register`
 - `POST /api/auth/otp-login`
 - `POST /api/auth/verify-otp`
 
-### Chat & AI
+### المحادثة والذكاء الاصطناعي
 - `POST /api/ai/chat`
 - `POST /api/ai/analyze-image`
 - `GET /api/conversations`
 - `GET /api/conversations/{id}/summary`
 
-### Subscription
+### الاشتراك
 - `GET /api/subscription/status`
 - `POST /api/subscription/subscribe`
 
-## 🚀 Deployment
+## 🚀 النشر
 
-### Android Play Store
-1. Build release APK
-2. Sign with release keystore
-3. Upload to Play Console
-4. Configure app listing
+### متجر Google Play
+1. بناء APK للإصدار
+2. التوقيع بمفتاح الإصدار
+3. الرفع إلى Play Console
+4. إعداد قائمة التطبيق
 
-### iOS App Store
-1. Build for iOS release
-2. Archive in Xcode
-3. Upload to App Store Connect
-4. Submit for review
+## 🤝 المساهمة
 
-## 🤝 Contributing
+1. فرع المستودع
+2. إنشاء فرع المميزة
+3. إجراء التغييرات
+4. اختبار شامل
+5. إرسال طلب السحب
 
-1. Fork the repository
-2. Create feature branch
-3. Make changes
-4. Test thoroughly
-5. Submit pull request
+## 📄 الترخيص
 
-## 📄 License
+هذا المشروع مرخص تحت رخصة MIT.
 
-This project is licensed under the MIT License.
+## 🆘 الدعم
 
-## 🆘 Support
-
-For support:
-- Email: support@medicothink.com
-- Documentation: https://docs.medicothink.com
-- Issues: GitHub Issues
+للدعم:
+- البريد الإلكتروني: support@medicothink.com
+- التوثيق: https://docs.medicothink.com
+- المشاكل: GitHub Issues
 
 ---
 
-**Built for mobile-first medical assistance**
+**مطور للمساعدة الطبية المحمولة أولاً**
