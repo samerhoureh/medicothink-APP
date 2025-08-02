@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ConversationController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\EnhancedChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,6 +31,14 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/ai/chat', [ChatController::class, 'sendMessage']);
     Route::post('/ai/analyze-image', [ChatController::class, 'analyzeImage']);
     
+    // Enhanced AI Features
+    Route::post('/ai/text', [EnhancedChatController::class, 'sendTextMessage']);
+    Route::post('/ai/image-analysis', [EnhancedChatController::class, 'analyzeImage']);
+    Route::post('/ai/text-to-speech', [EnhancedChatController::class, 'textToSpeech']);
+    Route::post('/ai/speech-to-text', [EnhancedChatController::class, 'speechToText']);
+    Route::post('/ai/generate-image', [EnhancedChatController::class, 'generateImage']);
+    Route::post('/ai/generate-video', [EnhancedChatController::class, 'generateVideo']);
+    
     // Conversations
     Route::get('/conversations', [ConversationController::class, 'index']);
     Route::get('/conversations/{id}', [ConversationController::class, 'show']);
@@ -41,4 +51,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/subscription/status', [SubscriptionController::class, 'status']);
     Route::get('/subscription/plans', [SubscriptionController::class, 'plans']);
     Route::post('/subscription/subscribe', [SubscriptionController::class, 'subscribe']);
+    
+    // Payments
+    Route::post('/payment/stripe', [PaymentController::class, 'processStripePayment']);
+    Route::post('/payment/paypal', [PaymentController::class, 'processPayPalPayment']);
+    Route::get('/payment/history', [PaymentController::class, 'getPaymentHistory']);
 });
