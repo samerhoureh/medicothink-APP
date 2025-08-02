@@ -1,6 +1,6 @@
 class ApiConfig {
   // Base URL for your Laravel web dashboard API
-  static const String baseUrl = 'https://your-dashboard-domain.com/api';
+  static const String baseUrl = 'http://localhost:8000/api';
   
   // API Endpoints
   static const String loginEndpoint = '/auth/login';
