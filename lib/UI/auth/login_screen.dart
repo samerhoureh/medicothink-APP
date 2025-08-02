@@ -151,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const SizedBox(height: 32),
                     PrimaryButton(
-                      text: _isLoading ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول',
+                      text: _isLoading ? 'Logging in...' : 'LOGIN',
                       onTap: _isLoading ? () {} : _login,
                     ),
                     const SizedBox(height: 24),
@@ -186,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Icon(Icons.phone_android, color: AppColors.kNavy, size: 20),
                               SizedBox(width: 8),
                               Text(
-                                'تسجيل الدخول بـ OTP',
+                                'Login with OTP',
                                 style: TextStyle(
                                   color: AppColors.kNavy,
                                   fontWeight: FontWeight.w600,
@@ -202,12 +202,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("ليس لديك حساب؟ ", style: TextStyle(color: Colors.white70)),
+                        const Text("Don't have an account? ", style: TextStyle(color: Colors.white70)),
                         GestureDetector(
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute(builder: (_) => const RegisterScreen()),
                           ),
-                          child: const Text('إنشاء حساب',
+                          child: const Text('Register',
                               style: TextStyle(color: Colors.white, decoration: TextDecoration.underline)),
                         ),
                       ],

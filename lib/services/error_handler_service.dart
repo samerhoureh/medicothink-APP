@@ -35,19 +35,19 @@ class ErrorHandlerService {
     final errorString = error.toString().toLowerCase();
     
     if (errorString.contains('socket') || errorString.contains('network')) {
-      return 'فشل في الاتصال بالإنترنت. يرجى التحقق من اتصالك.';
+      return 'Failed to connect to the internet. Please check your connection.';
     } else if (errorString.contains('timeout')) {
-      return 'انتهت مهلة الطلب. يرجى المحاولة مرة أخرى.';
+      return 'Request timeout. Please try again.';
     } else if (errorString.contains('unauthorized') || errorString.contains('401')) {
-      return 'انتهت صلاحية جلسة العمل. يرجى تسجيل الدخول مرة أخرى.';
+      return 'Session expired. Please login again.';
     } else if (errorString.contains('forbidden') || errorString.contains('403')) {
-      return 'ليس لديك صلاحية للوصول إلى هذا المحتوى.';
+      return 'You do not have permission to access this content.';
     } else if (errorString.contains('not found') || errorString.contains('404')) {
-      return 'المحتوى المطلوب غير موجود.';
+      return 'The requested content was not found.';
     } else if (errorString.contains('server') || errorString.contains('500')) {
-      return 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
+      return 'Server error. Please try again later.';
     } else {
-      return 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.';
+      return 'An unexpected error occurred. Please try again.';
     }
   }
 
@@ -66,28 +66,28 @@ class ErrorHandlerService {
       case 403:
         AppHelpers.showSnackBar(
           context,
-          'ليس لديك صلاحية للوصول إلى هذا المحتوى',
+          'You do not have permission to access this content',
           type: SnackBarType.error,
         );
         break;
       case 422:
         AppHelpers.showSnackBar(
           context,
-          message ?? 'البيانات المدخلة غير صحيحة',
+          message ?? 'Invalid input data',
           type: SnackBarType.error,
         );
         break;
       case 500:
         AppHelpers.showSnackBar(
           context,
-          'خطأ في الخادم. يرجى المحاولة لاحقاً',
+          'Server error. Please try again later',
           type: SnackBarType.error,
         );
         break;
       default:
         AppHelpers.showSnackBar(
           context,
-          message ?? 'حدث خطأ غير متوقع',
+          message ?? 'An unexpected error occurred',
           type: SnackBarType.error,
         );
     }
@@ -96,7 +96,7 @@ class ErrorHandlerService {
   void _handleUnauthorized(BuildContext context) {
     AppHelpers.showSnackBar(
       context,
-      'انتهت صلاحية جلسة العمل',
+      'Session expired',
       type: SnackBarType.error,
     );
     
