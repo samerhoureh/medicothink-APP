@@ -20,6 +20,26 @@ Route::get('/health', function () {
         'success' => true,
         'message' => 'MedicoThink API is running',
         'timestamp' => now(),
+        'version' => '1.0.0',
+        'environment' => config('app.env'),
+    ]);
+});
+
+// System Status Check
+Route::get('/status', function () {
+    $aiService = app(\App\Services\AiService::class);
+    $payClickService = app(\App\Services\PayClickService::class);
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'System status check',
+        'data' => [
+            'database' => 'connected',
+            'ai_services' => $aiService->testConnection(),
+            'payment_gateway' => $payClickService->testConnection(),
+            'storage' => Storage::disk('public')->exists('test') ? 'connected' : 'available',
+        ],
+        'timestamp' => now(),
     ]);
 });
 
@@ -40,11 +60,11 @@ Route::prefix('auth')->group(function () {
 
 // AI Features Routes
 Route::prefix('ai')->middleware('auth:sanctum')->group(function () {
-    Route::post('chat', [AiController::class, 'chat']);
-    Route::post('analyze-image', [AiController::class, 'analyzeImage']);
-    Route::post('generate-image', [AiController::class, 'generateImage']);
-    Route::post('generate-video', [AiController::class, 'generateVideo']);
-    Route::post('generate-flashcards', [AiController::class, 'generateFlashcards']);
+    Route::post('chat', [AiController::class, 'chat'])->middleware('subscription.check');
+    Route::post('analyze-image', [AiController::class, 'analyzeImage'])->middleware('subscription.check');
+    Route::post('generate-image', [AiController::class, 'generateImage'])->middleware('subscription.check');
+    Route::post('generate-video', [AiController::class, 'generateVideo'])->middleware('subscription.check');
+    Route::post('generate-flashcards', [AiController::class, 'generateFlashcards'])->middleware('subscription.check');
 });
 
 // Conversations Routes

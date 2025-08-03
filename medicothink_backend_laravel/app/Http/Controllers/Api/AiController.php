@@ -29,14 +29,6 @@ class AiController extends Controller
     {
         try {
             $user = $request->user();
-            
-            // Check token usage
-            if (!$user->canUseTokens()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token limit exceeded. Please upgrade your subscription.',
-                ], 403);
-            }
 
             // Get or create conversation
             $conversation = null;
@@ -94,24 +86,28 @@ class AiController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => 'Chat response generated successfully',
                 'data' => [
                     'conversation_id' => $conversation->id,
                     'user_message' => [
                         'id' => $userMessage->id,
                         'content' => $userMessage->content,
                         'is_from_user' => true,
+                        'message_type' => 'text',
                         'created_at' => $userMessage->created_at,
                     ],
                     'ai_message' => [
                         'id' => $aiMessage->id,
                         'content' => $aiMessage->content,
                         'is_from_user' => false,
+                        'message_type' => 'text',
                         'created_at' => $aiMessage->created_at,
                     ],
                 ],
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Chat Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Chat request failed',
@@ -124,14 +120,6 @@ class AiController extends Controller
     {
         try {
             $user = $request->user();
-            
-            // Check image usage
-            if (!$user->canUseImages()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Image analysis limit exceeded. Please upgrade your subscription.',
-                ], 403);
-            }
 
             // Store uploaded image
             $imagePath = $request->file('image')->store('medical_images', 'public');
@@ -147,14 +135,14 @@ class AiController extends Controller
             if (!$conversation) {
                 $conversation = Conversation::create([
                     'user_id' => $user->id,
-                    'title' => 'تحليل صورة طبية - ' . now()->format('Y-m-d H:i'),
+                    'title' => 'Medical Image Analysis - ' . now()->format('Y-m-d H:i'),
                 ]);
             }
 
             // Save user message with image
             $userMessage = Message::create([
                 'conversation_id' => $conversation->id,
-                'content' => $request->question ?: 'يرجى تحليل هذه الصورة الطبية',
+                'content' => $request->question ?: 'Please analyze this medical image',
                 'is_from_user' => true,
                 'message_type' => 'image',
                 'image_path' => $imagePath,
@@ -179,12 +167,14 @@ class AiController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => 'Image analysis completed successfully',
                 'data' => [
                     'conversation_id' => $conversation->id,
                     'user_message' => [
                         'id' => $userMessage->id,
                         'content' => $userMessage->content,
                         'is_from_user' => true,
+                        'message_type' => 'image',
                         'image_url' => asset('storage/' . $imagePath),
                         'created_at' => $userMessage->created_at,
                     ],
@@ -192,12 +182,14 @@ class AiController extends Controller
                         'id' => $aiMessage->id,
                         'content' => $analysis,
                         'is_from_user' => false,
+                        'message_type' => 'text',
                         'created_at' => $aiMessage->created_at,
                     ],
                 ],
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Image Analysis Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Image analysis failed',
@@ -210,14 +202,6 @@ class AiController extends Controller
     {
         try {
             $user = $request->user();
-            
-            // Check image usage
-            if (!$user->canUseImages()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Image generation limit exceeded. Please upgrade your subscription.',
-                ], 403);
-            }
 
             // Generate image
             $imagePath = $this->aiService->generateImage($request->prompt);
@@ -240,7 +224,7 @@ class AiController extends Controller
             if (!$conversation) {
                 $conversation = Conversation::create([
                     'user_id' => $user->id,
-                    'title' => 'توليد صورة - ' . now()->format('Y-m-d H:i'),
+                    'title' => 'Image Generation - ' . now()->format('Y-m-d H:i'),
                 ]);
             }
 
@@ -255,7 +239,7 @@ class AiController extends Controller
             // Save generated image
             $aiMessage = Message::create([
                 'conversation_id' => $conversation->id,
-                'content' => 'تم توليد الصورة بناءً على طلبك',
+                'content' => 'Image generated based on your request',
                 'is_from_user' => false,
                 'message_type' => 'image',
                 'image_path' => $imagePath,
@@ -269,14 +253,17 @@ class AiController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => 'Image generated successfully',
                 'data' => [
                     'conversation_id' => $conversation->id,
                     'image_url' => asset('storage/' . $imagePath),
                     'message_id' => $aiMessage->id,
+                    'prompt' => $request->prompt,
                 ],
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Image Generation Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Image generation failed',
@@ -289,14 +276,6 @@ class AiController extends Controller
     {
         try {
             $user = $request->user();
-            
-            // Check video usage
-            if (!$user->canUseVideos()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Video generation limit exceeded. Please upgrade your subscription.',
-                ], 403);
-            }
 
             // Generate video (placeholder implementation)
             $videoPath = $this->aiService->generateVideo($request->prompt);
@@ -304,7 +283,7 @@ class AiController extends Controller
             if (!$videoPath) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Video generation is not available yet',
+                    'message' => 'Video generation is not available yet. This feature is coming soon.',
                 ], 501);
             }
 
@@ -313,12 +292,15 @@ class AiController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => 'Video generated successfully',
                 'data' => [
                     'video_url' => asset('storage/' . $videoPath),
+                    'prompt' => $request->prompt,
                 ],
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Video Generation Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Video generation failed',
@@ -331,14 +313,6 @@ class AiController extends Controller
     {
         try {
             $user = $request->user();
-            
-            // Check token usage
-            if (!$user->canUseTokens()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Token limit exceeded. Please upgrade your subscription.',
-                ], 403);
-            }
 
             // Generate flashcards
             $flashcards = $this->aiService->generateFlashcards(
@@ -357,14 +331,14 @@ class AiController extends Controller
             if (!$conversation) {
                 $conversation = Conversation::create([
                     'user_id' => $user->id,
-                    'title' => 'بطاقات تعليمية - ' . $request->topic,
+                    'title' => 'Flashcards - ' . $request->topic,
                 ]);
             }
 
             // Save user request
             $userMessage = Message::create([
                 'conversation_id' => $conversation->id,
-                'content' => "إنشاء بطاقات تعليمية حول: {$request->topic}",
+                'content' => "Generate flashcards about: {$request->topic}",
                 'is_from_user' => true,
                 'message_type' => 'text',
             ]);
@@ -372,7 +346,7 @@ class AiController extends Controller
             // Save flashcards
             $aiMessage = Message::create([
                 'conversation_id' => $conversation->id,
-                'content' => 'تم إنشاء البطاقات التعليمية',
+                'content' => 'Flashcards have been generated',
                 'is_from_user' => false,
                 'message_type' => 'flashcards',
                 'flashcards' => $flashcards,
@@ -386,14 +360,18 @@ class AiController extends Controller
 
             return response()->json([
                 'success' => true,
+                'message' => 'Flashcards generated successfully',
                 'data' => [
                     'conversation_id' => $conversation->id,
                     'flashcards' => $flashcards,
                     'message_id' => $aiMessage->id,
+                    'topic' => $request->topic,
+                    'count' => count($flashcards),
                 ],
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Flashcards Generation Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Flashcards generation failed',

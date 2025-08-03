@@ -70,4 +70,16 @@ return [
         'from_number' => env('SMS_FROM_NUMBER'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Twilio SMS Service
+    |--------------------------------------------------------------------------
+    */
+
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_TOKEN'),
+        'from' => env('TWILIO_FROM'),
+    ],
+
 ];

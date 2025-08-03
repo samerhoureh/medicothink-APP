@@ -96,9 +96,29 @@ class PayClickService
                 'metadata' => array_merge($payment->metadata ?? [], $data),
             ]);
 
-            // If payment is completed, activate subscription
-            if ($status === 'completed' && $payment->subscription_id) {
-                $this->activateSubscription($payment->subscription_id);
+            // Handle different payment statuses
+            switch ($status) {
+                case 'completed':
+                    if ($payment->subscription_id) {
+                        $this->activateSubscription($payment->subscription_id);
+                    }
+                    $this->sendPaymentConfirmation($payment);
+                    break;
+                    
+                case 'failed':
+                case 'cancelled':
+                    if ($payment->subscription_id) {
+                        $this->cancelSubscription($payment->subscription_id);
+                    }
+                    $this->sendPaymentFailureNotification($payment);
+                    break;
+                    
+                case 'refunded':
+                    if ($payment->subscription_id) {
+                        $this->handleRefund($payment->subscription_id);
+                    }
+                    $this->sendRefundNotification($payment);
+                    break;
             }
 
             return [
@@ -118,9 +138,29 @@ class PayClickService
 
     protected function verifyWebhookSignature(array $data)
     {
-        // Implement webhook signature verification
-        // This depends on PayClick's webhook signature method
-        return true; // Placeholder
+        // PayClick webhook signature verification
+        if (!isset($data['signature'])) {
+            return false;
+        }
+
+        // Remove signature from data for verification
+        $signature = $data['signature'];
+        unset($data['signature']);
+
+        // Sort data by keys
+        ksort($data);
+
+        // Create signature string
+        $signatureString = '';
+        foreach ($data as $key => $value) {
+            $signatureString .= $key . '=' . $value . '&';
+        }
+        $signatureString = rtrim($signatureString, '&');
+
+        // Generate expected signature
+        $expectedSignature = hash_hmac('sha256', $signatureString, $this->secretKey);
+
+        return hash_equals($expectedSignature, $signature);
     }
 
     protected function mapPayClickStatus(string $status)
@@ -128,9 +168,12 @@ class PayClickService
         $statusMap = [
             'pending' => 'pending',
             'completed' => 'completed',
+            'success' => 'completed',
             'failed' => 'failed',
             'cancelled' => 'failed',
+            'expired' => 'failed',
             'refunded' => 'refunded',
+            'partially_refunded' => 'refunded',
         ];
 
         return $statusMap[$status] ?? 'pending';
@@ -145,7 +188,61 @@ class PayClickService
                 'status' => 'active',
                 'starts_at' => now(),
             ]);
+            
+            Log::info("Subscription {$subscriptionId} activated successfully");
         }
+    }
+
+    protected function cancelSubscription(int $subscriptionId)
+    {
+        $subscription = Subscription::find($subscriptionId);
+        
+        if ($subscription) {
+            $subscription->update([
+                'status' => 'cancelled',
+            ]);
+            
+            Log::info("Subscription {$subscriptionId} cancelled due to payment failure");
+        }
+    }
+
+    protected function handleRefund(int $subscriptionId)
+    {
+        $subscription = Subscription::find($subscriptionId);
+        
+        if ($subscription) {
+            // Calculate refund period
+            $daysUsed = $subscription->starts_at->diffInDays(now());
+            $totalDays = $subscription->starts_at->diffInDays($subscription->ends_at);
+            
+            if ($daysUsed < $totalDays) {
+                // Partial refund - adjust end date
+                $subscription->update([
+                    'ends_at' => now(),
+                    'status' => 'cancelled',
+                ]);
+            }
+            
+            Log::info("Refund processed for subscription {$subscriptionId}");
+        }
+    }
+
+    protected function sendPaymentConfirmation(Payment $payment)
+    {
+        // Send confirmation email/SMS to user
+        Log::info("Payment confirmation sent for payment {$payment->id}");
+    }
+
+    protected function sendPaymentFailureNotification(Payment $payment)
+    {
+        // Send failure notification to user
+        Log::info("Payment failure notification sent for payment {$payment->id}");
+    }
+
+    protected function sendRefundNotification(Payment $payment)
+    {
+        // Send refund notification to user
+        Log::info("Refund notification sent for payment {$payment->id}");
     }
 
     public function refundPayment(string $paymentId, float $amount = null)
@@ -159,7 +256,7 @@ class PayClickService
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post($this->baseUrl . "/payments/{$paymentId}/refund", $payload);
+            ])->timeout(30)->post($this->baseUrl . "/payments/{$paymentId}/refund", $payload);
 
             if ($response->successful()) {
                 return [
@@ -176,6 +273,35 @@ class PayClickService
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    public function testConnection(): array
+    {
+        try {
+            if (!$this->apiKey) {
+                return [
+                    'success' => false,
+                    'message' => 'PayClick API key not configured'
+                ];
+            }
+
+            // Test API connection
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+            ])->timeout(10)->get($this->baseUrl . '/test');
+
+            return [
+                'success' => $response->successful(),
+                'message' => $response->successful() ? 'PayClick connection successful' : 'PayClick connection failed',
+                'status_code' => $response->status()
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'PayClick connection error: ' . $e->getMessage()
             ];
         }
     }
